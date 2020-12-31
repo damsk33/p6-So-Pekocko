@@ -1,0 +1,135 @@
+swagger: "2.0"
+info:
+  description: "This is a sample server saucesstore server.  You can find out more about     Swagger at [http://swagger.io](http://swagger.io) or on [irc.freenode.net, #swagger](http://swagger.io/irc/).      For this sample, you can use the api key `special-key` to test the authorization     filters."
+  version: "1.0.0"
+  title: "Swagger saucesstore"
+  termsOfService: "http://swagger.io/terms/"
+  contact:
+    email: "apiteam@swagger.io"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+host: "saucesstore.swagger.io"
+basePath: "/v2"
+tags:
+- name: "sauces"
+  description: "Everything about your saucess"
+  externalDocs:
+    description: "Find out more"
+- name: "auth"
+  description: "Operations about authentication"
+  externalDocs:
+    description: "Find out more"
+schemes:
+- "http"
+paths:
+  /sauces:
+    post:
+      tags:
+      - "sauces"
+      summary: "Add a new sauces"
+      description: "Returns a JSON Object"
+    get:
+      tags:
+      - "sauces"
+      summary: "Find all sauces"
+      description: "Returns an array of sauces"
+  /sauces/{saucesId}:
+    get:
+      tags:
+      - "sauces"
+      summary: "Find sauces by ID"
+      description: "Returns a single sauces"
+    put:
+      tags:
+      - "sauces"
+      summary: "Updates a sauces"
+      description: "Returns a JSON Object"
+    delete:
+      tags:
+      - "sauces"
+      summary: "Deletes a sauces"
+      description: "Returns a JSON Object"
+  /sauces/{saucesId}/like:
+    post:
+      tags:
+      - "sauces"
+      summary: "Rate a sauces"
+      description: "Returns a JSON Object"
+  /auth/signup:
+    post:
+      tags:
+      - "auth"
+      summary: "Register a new user"
+      description: "Returns a JSON Object"
+  /user/login:
+    post:
+      tags:
+      - "auth"
+      summary: "Login a user and return a token"
+      description: "Returns a JSON Object"
+securityDefinitions:
+  saucesstore_auth:
+    type: "oauth2"
+    authorizationUrl: "http://saucesstore.swagger.io/oauth/dialog"
+    flow: "implicit"
+    scopes:
+      write:saucess: "modify saucess in your account"
+      read:saucess: "read your saucess"
+  api_key:
+    type: "apiKey"
+    name: "api_key"
+    in: "header"
+definitions:
+  User:
+    type: "object"
+    properties:
+      userId:
+        type: "ObjectId"
+      email:
+        type: "string"
+      password:
+        type: "string"
+    xml:
+      name: "User"
+  sauces:
+    type: "object"
+    properties:
+      id:
+        type: "ObjectId"
+      userId:
+        type: "string"
+      name:
+        type: "string"
+      manufacturer:
+        type: "string"
+      description:
+        type: "string"
+      mainPepper:
+        type: "string"
+      imageUrl:
+        type: "string"
+      heat:
+        type: "integer"
+        format: "int32"
+        description: "Between 1 and 10"
+      likes:
+        type: "integer"
+        format: "int32"
+      dislikes:
+        type: "integer"
+        format: "int32"
+      usersLiked:
+        type: "Array<string>"
+      usersDisliked:
+        type: "Array<string>"
+    xml:
+      name: "sauces"
+  ApiResponse:
+    type: "object"
+    properties:
+      message:
+        type: "string"
+externalDocs:
+  description: "Find out more about Swagger"
+  url: "http://swagger.io"
