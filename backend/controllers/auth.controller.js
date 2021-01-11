@@ -24,24 +24,26 @@ exports.signup = (req, res) => {
     let emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     if (emailRegex.test(req.body.email)) {
         user.email = encrypt(req.body.email, key, { iv: iv });
-        user.hashPassword(req.body.password).then(hashedPassword => {
-            user.password = hashedPassword;
-            user.save().then(
-                (newUser) => {
-                    res.status(201).json({ messages: 'Your account have been registered successfully.' });
-                }
-            ).catch(
-                (error) => {
-                    if (error.code === 11000) {
-                        res.status(442).json({ messages: 'An account with this email address already exists.' });
-                    } else {
-                        res.status(400).json({ messages: error.message });
+        user.hashPassword(req.body.password).then((hashedPassword, err) => {
+            if (err) {
+                res.status(400).json({ messages: err.message });
+            } else {
+                user.password = hashedPassword;
+                user.save().then(
+                    (newUser) => {
+                        res.status(201).json({ messages: 'Your account have been registered successfully.' });
                     }
-                }
-            );
-        }).reject(err => {
-            return res.status(400).json({ messages: 'Password not valid.' });
-        })
+                ).catch(
+                    (error) => {
+                        if (error.code === 11000) {
+                            res.status(442).json({ messages: 'An account with this email address already exists.' });
+                        } else {
+                            res.status(400).json({ messages: error.message });
+                        }
+                    }
+                );
+            }
+        });
     } else {
         return res.status(400).json({ messages: 'Email not valid.' });;
     }
