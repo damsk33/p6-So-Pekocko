@@ -1,19 +1,19 @@
 swagger: "2.0"
 info:
-  description: "This is a sample server saucesstore server.  You can find out more about     Swagger at [http://swagger.io](http://swagger.io) or on [irc.freenode.net, #swagger](http://swagger.io/irc/).      For this sample, you can use the api key `special-key` to test the authorization     filters."
+  description: "This is a sample server saucestore server.  You can find out more about     Swagger at [http://swagger.io](http://swagger.io) or on [irc.freenode.net, #swagger](http://swagger.io/irc/).      For this sample, you can use the api key `special-key` to test the authorization     filters."
   version: "1.0.0"
-  title: "Swagger saucesstore"
+  title: "Swagger saucestore"
   termsOfService: "http://swagger.io/terms/"
   contact:
     email: "apiteam@swagger.io"
   license:
     name: "Apache 2.0"
     url: "http://www.apache.org/licenses/LICENSE-2.0.html"
-host: "saucesstore.swagger.io"
+host: "saucestore.swagger.io"
 basePath: "/v2"
 tags:
 - name: "sauces"
-  description: "Everything about your saucess"
+  description: "Everything about your sauces"
   externalDocs:
     description: "Find out more"
 - name: "auth"
@@ -69,13 +69,13 @@ paths:
       summary: "Login a user and return a token"
       description: "Returns a JSON Object"
 securityDefinitions:
-  saucesstore_auth:
+  saucestore_auth:
     type: "oauth2"
-    authorizationUrl: "http://saucesstore.swagger.io/oauth/dialog"
+    authorizationUrl: "http://saucestore.swagger.io/oauth/dialog"
     flow: "implicit"
     scopes:
-      write:saucess: "modify saucess in your account"
-      read:saucess: "read your saucess"
+      write:sauces: "modify sauces in your account"
+      read:sauces: "read your sauces"
   api_key:
     type: "apiKey"
     name: "api_key"

@@ -20,15 +20,26 @@ const userSchema = new mongoose.Schema({
     }
 });
 
-// Verify email structure with regex
-userSchema.path('email').validate((val) => {
-    let emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    return emailRegex.test(val);
-}, 'L\'email n\'est pas valide');
+// Verify email structure with regex | maintenant dans le controller avant de le crypter
+//userSchema.path('email').validate((val) => {
+//    let emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+//    return emailRegex.test(val);
+//}, 'L\'email n\'est pas valide');
 
 // Crypting with passport for security
-userSchema.methods.checkPassword = function(password) {
+userSchema.methods.checkPassword = function (password) {
     return bcrypt.compareSync(password, this.password);
+};
+
+userSchema.methods.hashPassword = function (password) {
+    const saltRounds = 10;
+    const hashedPassword = new Promise((resolve, reject) => {
+        bcrypt.hash(password, saltRounds, function (err, hash) {
+            if (err) reject(err)
+            resolve(hash)
+        });
+    })
+    return hashedPassword
 };
 
 // Generate JavaWebToken for security

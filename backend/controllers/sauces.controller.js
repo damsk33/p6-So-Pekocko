@@ -4,6 +4,9 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
+const sauceImgURL = 'http://localhost:3000/images/sauces/';
+const sauceImgPath = '..\\images\\sauces\\';
+
 // Used for create sauce and update sauce for image uploading
 const storageImage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -52,26 +55,30 @@ exports.getSauceById = (req, res, next) => {
 exports.createSauce = (req, res) => {
     let upload = multer({ storage: storageImage }).any()
     upload(req, res, (err) => {
-        const sauceData = JSON.parse(req.body.sauce);
-        const sauce = new Sauces();
-        sauce.id = req.body.file.id
-        sauce.userId = sauceData.userId;
-        sauce.name = sauceData.name;
-        sauce.manufacturer = sauceData.manufacturer;
-        sauce.description = sauceData.description;
-        sauce.mainPepper = sauceData.mainPepper;
-        sauce.heat = sauceData.heat;
-        sauce.imageUrl = 'http://localhost:3000/images/sauces/' + req.body.file.id + req.body.file.ext;
+        if (err) {
+            res.status(400).json({ messages: error.message });
+        } else {
+            const sauceData = JSON.parse(req.body.sauce);
+            const sauce = new Sauces();
+            sauce.id = req.body.file.id
+            sauce.userId = sauceData.userId;
+            sauce.name = sauceData.name;
+            sauce.manufacturer = sauceData.manufacturer;
+            sauce.description = sauceData.description;
+            sauce.mainPepper = sauceData.mainPepper;
+            sauce.heat = sauceData.heat;
+            sauce.imageUrl = sauceImgURL + req.body.file.id + req.body.file.ext;
 
-        sauce.save().then(
-            (newSauce) => {
-                res.status(201).json({ message: 'Sauce created successfully.' });
-            }
-        ).catch(
-            (error) => {
-                res.status(400).json({ messages: error.message });
-            }
-        );
+            sauce.save().then(
+                (newSauce) => {
+                    res.status(201).json({ message: 'Sauce created successfully.' });
+                }
+            ).catch(
+                (error) => {
+                    res.status(400).json({ messages: error.message });
+                }
+            );
+        }
     });
 }
 
@@ -87,36 +94,42 @@ exports.updateSauceById = (req, res, next) => {
         } else {
             let upload = multer({ storage: storageImage }).any()
             upload(req, res, (err) => {
-                // If file then body.sauce, otherwise just the body
-                const sauceData = req.body.file ? JSON.parse(req.body.sauce) : req.body;
-                sauce.name = sauceData.name;
-                sauce.manufacturer = sauceData.manufacturer;
-                sauce.description = sauceData.description;
-                sauce.mainPepper = sauceData.mainPepper;
-                sauce.heat = sauceData.heat;
-                sauce.save().then(
-                    () => {
-                        if (req.body.file) { // There is a file
-                            let actualImage = sauce.imageUrl.substring(sauce.imageUrl.lastIndexOf('/') + 1);
-                            let uploadedName = req.body.file.id + req.body.file.ext
-                            sauce.imageUrl = sauce.imageUrl.substring(0, sauce.imageUrl.lastIndexOf('.')) + req.body.file.ext;
-
-                            // Delete the old image
-                            fs.unlink(path.join(__dirname, '..\\images\\sauces\\' + actualImage), (err, data) => {
-                                // Rename the new temp image to the name of the previous deleted
-                                fs.rename(path.join(__dirname, '..\\images\\sauces\\' + uploadedName), path.join(__dirname, '..\\images\\sauces\\' + sauce.id + req.body.file.ext), (err, data) => {
-                                    res.status(200).json({ message: 'Sauce updated with success.' });
+                if (err) {
+                    res.status(400).json({ messages: error.message });
+                } else {
+                    // If file then body.sauce, otherwise just the body
+                    const sauceData = req.body.file ? JSON.parse(req.body.sauce) : req.body;
+                    sauce.name = sauceData.name;
+                    sauce.manufacturer = sauceData.manufacturer;
+                    sauce.description = sauceData.description;
+                    sauce.mainPepper = sauceData.mainPepper;
+                    sauce.heat = sauceData.heat;
+                    if (req.body.file) { // There is a file
+                        sauce.imageUrl = sauceImgURL + sauce.id + req.body.file.ext;
+                    }
+                    sauce.save().then(
+                        (theSauce) => {
+                            if (req.body.file) { // There is a file
+                                let actualImgName = theSauce.imageUrl.replace(sauceImgURL, '');
+                                let uploadedImgName = req.body.file.id + req.body.file.ext;
+                                let newImgName = theSauce.id + req.body.file.ext;
+                                // Delete the old image
+                                fs.unlink(path.join(__dirname, sauceImgPath + actualImgName), (err, data) => {
+                                    // Rename the new temp image to the name of the previous deleted
+                                    fs.rename(path.join(__dirname, sauceImgPath + uploadedImgName), path.join(__dirname, sauceImgPath + newImgName), (err, data) => {
+                                        res.status(200).json({ message: 'Sauce updated with success.' });
+                                    });
                                 });
-                            });
-                        } else {
-                            res.status(200).json({ message: 'Sauce updated with success.' });
+                            } else {
+                                res.status(200).json({ message: 'Sauce updated with success.' });
+                            }
                         }
-                    }
-                ).catch(
-                    (error) => {
-                        res.status(400).json({ message: error.message });
-                    }
-                );
+                    ).catch(
+                        (error) => {
+                            res.status(400).json({ message: error.message });
+                        }
+                    );
+                }
             });
         }
     });
@@ -155,7 +168,6 @@ exports.deleteSauceById = (req, res, next) => {
  * Use cases: like == 1 => like | like == 0 => no advise | like == -1 => dislike
  */
 exports.setSaucesAdvise = (req, res, next) => {
-    console.log('Action -> like \ dislike : ', req.body);
     Sauces.findOne({ _id: req.params.id }, (err, sauce) => {
         if (!sauce) {
             res.status(404).json({ message: 'Sauce not found.' });

@@ -1,3 +1,4 @@
+require('dotenv').config();
 require('./config/config');
 require('./config/database');
 require('./config/passport.config');
@@ -8,14 +9,21 @@ const express = require('express');
 const cors = require('cors');
 
 const jwtVerify = require('./config/jwt.verify');
-const passport = require('passport'); //*
+const passport = require('passport');
+const helmet = require('helmet');
 const path = require('path');
 const app = express();
 
-const port = process.env.PORT || 3000;
-
+app.use(helmet());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content, Accept, Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+  next();
+});
 
 app.use(cookieParser());
 app.use(cors({ origin: true, credentials: true }));
@@ -29,10 +37,4 @@ app.use('/api/auth', authRouter);
 app.use('/api/sauces', jwtVerify.verifyJwtToken, saucesRouter);
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
-
-// Run the server
-app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`)
-});
-
-exports = app;
+module.exports = app;

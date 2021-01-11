@@ -3,13 +3,21 @@ const jwt = require('jsonwebtoken');
 module.exports.verifyJwtToken = (req, res, next) => {
     if (!req.headers.authorization) {
         res.status(403).send({ message: 'No token got' });
-    }
-    jwt.verify(req.headers.authorization.replace('Bearer ', ''), process.env.JWT_SECRET, (err, decoded) => {
-        if (err) {
-            console.log(err)
-            res.status(500).send({ message: 'Token not valid' });
+    } else {
+        try {
+            const token = req.headers.authorization.split(' ')[1];
+            const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+            const userId = decodedToken.userId;
+            if (req.body.userId && req.body.userId !== userId) {
+                throw 'Invalid user ID';
+            } else {
+                next();
+            }
+        } catch {
+            res.status(401).json({
+                error: new Error('Invalid request!')
+            });
         }
-        req._id = decoded._id;
-        next();
-    });
+
+    }
 };
