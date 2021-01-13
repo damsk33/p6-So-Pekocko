@@ -5,11 +5,10 @@ const passport = require('passport');
 const key = CryptoJS.enc.Hex.parse("000102030405060708090a0b0c0d0e0f");
 const iv = CryptoJS.enc.Hex.parse("101112131415161718191a1b1c1d1e1f");
 
-encrypt = (str) => {
+const encrypt = (str) => {
     return CryptoJS.AES.encrypt(str, key, { iv: iv }).toString();
 }
-
-decrypt = (str) => {
+const decrypt = (str) => {
     return CryptoJS.AES.decrypt(str, key, { iv: iv }).toString(CryptoJS.enc.Utf8);
 }
 
@@ -23,7 +22,7 @@ exports.signup = (req, res) => {
 
     let emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     if (emailRegex.test(req.body.email)) {
-        user.email = encrypt(req.body.email, key, { iv: iv });
+        user.email = encrypt(req.body.email);
         user.hashPassword(req.body.password).then((hashedPassword, err) => {
             if (err) {
                 res.status(400).json({ messages: err.message });
@@ -54,8 +53,8 @@ exports.signup = (req, res) => {
  * Expected : { email: string, password: string }
  */
 exports.login = (req, res) => {
-    req.body.email = encrypt(req.body.email, key, { iv: iv });
-    console.log('Action -> Sign-in: ', req.body);
+    console.log('Action -> Sign-in : ', req.body);
+    req.body.email = encrypt(req.body.email);
     passport.authenticate('local', (err, user, info) => {
         if (err) {
             res.status(400).json(err);

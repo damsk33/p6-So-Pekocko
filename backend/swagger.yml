@@ -1,6 +1,6 @@
 swagger: "2.0"
 info:
-  description: "This is a sample server saucestore server.  You can find out more about     Swagger at [http://swagger.io](http://swagger.io) or on [irc.freenode.net, #swagger](http://swagger.io/irc/).      For this sample, you can use the api key `special-key` to test the authorization     filters."
+  description: "This is a sample server saucestore server."
   version: "1.0.0"
   title: "Swagger saucestore"
   termsOfService: "http://swagger.io/terms/"
@@ -14,12 +14,8 @@ basePath: "/v2"
 tags:
 - name: "sauces"
   description: "Everything about your sauces"
-  externalDocs:
-    description: "Find out more"
 - name: "auth"
   description: "Operations about authentication"
-  externalDocs:
-    description: "Find out more"
 schemes:
 - "http"
 paths:
@@ -29,45 +25,53 @@ paths:
       - "sauces"
       summary: "Add a new sauces"
       description: "Returns a JSON Object"
+      responses: { message: "value" }
     get:
       tags:
       - "sauces"
       summary: "Find all sauces"
       description: "Returns an array of sauces"
+      responses: { message: "value" }
   /sauces/{saucesId}:
     get:
       tags:
       - "sauces"
       summary: "Find sauces by ID"
       description: "Returns a single sauces"
+      responses: "Sauce"
     put:
       tags:
       - "sauces"
       summary: "Updates a sauces"
       description: "Returns a JSON Object"
+      responses: { message: "value" }
     delete:
       tags:
       - "sauces"
       summary: "Deletes a sauces"
       description: "Returns a JSON Object"
+      responses: { message: "value" }
   /sauces/{saucesId}/like:
     post:
       tags:
       - "sauces"
       summary: "Rate a sauces"
       description: "Returns a JSON Object"
+      responses: { message: "value" }
   /auth/signup:
     post:
       tags:
       - "auth"
       summary: "Register a new user"
       description: "Returns a JSON Object"
-  /user/login:
+      responses: { message: "value" }
+  /auth/login:
     post:
       tags:
       - "auth"
       summary: "Login a user and return a token"
       description: "Returns a JSON Object"
+      responses: { message: "value" }
 securityDefinitions:
   saucestore_auth:
     type: "oauth2"
@@ -85,7 +89,7 @@ definitions:
     type: "object"
     properties:
       userId:
-        type: "ObjectId"
+        type: "string"
       email:
         type: "string"
       password:
@@ -96,7 +100,7 @@ definitions:
     type: "object"
     properties:
       id:
-        type: "ObjectId"
+        type: "string"
       userId:
         type: "string"
       name:
@@ -120,9 +124,9 @@ definitions:
         type: "integer"
         format: "int32"
       usersLiked:
-        type: "Array<string>"
+        type: "object"
       usersDisliked:
-        type: "Array<string>"
+        type: "object"
     xml:
       name: "sauces"
   ApiResponse:
