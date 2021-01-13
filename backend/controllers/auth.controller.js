@@ -54,8 +54,8 @@ exports.signup = (req, res) => {
  * Expected : { email: string, password: string }
  */
 exports.login = (req, res) => {
-    console.log('Action -> Sign-in : ', req.body);
     req.body.email = encrypt(req.body.email, key, { iv: iv });
+    console.log('Action -> Sign-in: ', req.body);
     passport.authenticate('local', (err, user, info) => {
         if (err) {
             res.status(400).json(err);
