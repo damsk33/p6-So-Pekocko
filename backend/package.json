@@ -1,7 +1,7 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "description": "Backend So pecocko",
+  "description": "",
   "engines": {
     "node": "12.18.x"
   },
@@ -9,8 +9,8 @@
   "scripts": {
     "serve": "node server.js"
   },
-  "author": "Damien Feybesse",
-  "license": "MIT",
+  "author": "",
+  "license": "ISC",
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
