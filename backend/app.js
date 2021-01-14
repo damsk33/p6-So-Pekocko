@@ -8,6 +8,10 @@ const bodyParser = require('body-parser');
 const express = require('express');
 const cors = require('cors');
 
+const ExpressBrute = require('express-brute');
+const store = new ExpressBrute.MemoryStore();
+const bruteforce = new ExpressBrute(store);
+
 const jwtVerify = require('./config/jwt.verify');
 const passport = require('passport');
 const helmet = require('helmet');
@@ -33,7 +37,7 @@ app.use(passport.initialize());
 const authRouter = require('./routers/auth.router');
 const saucesRouter = require('./routers/sauces.router');
 
-app.use('/api/auth', authRouter);
+app.use('/api/auth', bruteforce.prevent, authRouter);
 app.use('/api/sauces', jwtVerify.verifyJwtToken, saucesRouter);
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
