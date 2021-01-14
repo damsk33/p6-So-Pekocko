@@ -25,7 +25,6 @@ const storageImage = multer.diskStorage({
  * Expected: nothing 
  */
 exports.getAllSauces = (req, res, next) => {
-    console.log('Action -> Sauces get all : ', req.body);
     Sauces.find((err, sauces) => {
         if (!sauces) {
             res.status(404).json([]);
@@ -40,7 +39,6 @@ exports.getAllSauces = (req, res, next) => {
  * Expected: an id in the url 
  */
 exports.getSauceById = (req, res, next) => {
-    console.log('Action -> Sauces get one : ', req.body);
     Sauces.findOne({ _id: req.params.id }, (err, sauce) => {
         if (!sauce) {
             res.status(404).json({});
@@ -55,7 +53,6 @@ exports.getSauceById = (req, res, next) => {
  * Expected: { sauce : Chaîne, image : Fichier }
  */
 exports.createSauce = (req, res) => {
-    console.log('Action -> Sauces create : ', req.body);
     let upload = multer({ storage: storageImage }).any()
     upload(req, res, (err) => {
         if (err) {
@@ -93,11 +90,10 @@ exports.createSauce = (req, res) => {
  * Expected 2: SOIT Sauce comme JSON OU { sauce : Chaîne, image : Fichier }
  */
 exports.updateSauceById = (req, res, next) => {
-    console.log('Action -> Sauces update : ', req.body);
     Sauces.findOne({ _id: req.params.id }, (err, sauce) => {
         if (!sauce) {
             res.status(404).json({ message: 'Sauce not found.' });
-        } else {
+        } else if(sauce.userId == req._id) {
             let upload = multer({ storage: storageImage }).any()
             upload(req, res, (err) => {
                 if (err) {
@@ -143,6 +139,8 @@ exports.updateSauceById = (req, res, next) => {
                     );
                 }
             });
+        } else {
+            res.status(400).json({ message: 'You do not have permission.' });
         }
     });
 };
@@ -155,7 +153,7 @@ exports.deleteSauceById = (req, res, next) => {
     Sauces.findOne({ _id: req.params.id }, (err, sauce) => {
         if (!sauce) {
             res.status(404).json({ message: 'Sauce not found.' });
-        } else {
+        } else if(sauce.userId == req._id) {
             sauce.delete().then(
                 () => {
                     let lastSlash = sauce.imageUrl.lastIndexOf('/');
@@ -169,6 +167,8 @@ exports.deleteSauceById = (req, res, next) => {
                     res.status(400).json({ message: error.message });
                 }
             );
+        } else {
+            res.status(400).json({ message: 'You do not have permission.' });
         }
     });
 };
@@ -180,7 +180,6 @@ exports.deleteSauceById = (req, res, next) => {
  * Use cases: like == 1 => like | like == 0 => no advise | like == -1 => dislike
  */
 exports.setSaucesAdvise = (req, res, next) => {
-    console.log('Action -> Sauces like/dislike : ', req.body);
     Sauces.findOne({ _id: req.params.id }, (err, sauce) => {
         if (!sauce) {
             res.status(404).json({ message: 'Sauce not found.' });

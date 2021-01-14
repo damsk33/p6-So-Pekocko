@@ -59,8 +59,7 @@ exports.login = (req, res) => {
         if (err) {
             res.status(400).json(err);
         } else if (user) {
-            const token = user.generateJwt();
-            res.cookie('token', token, { maxAge: 3600 * 60 * 1000, httpOnly: true });
+            const token = user.generateJwt(user.userId);
             res.status(200).json({ userId: user.userId, token: token });
         } else {
             res.status(404).json({ userId: null, token: null });

@@ -35,7 +35,9 @@ userSchema.methods.hashPassword = function (password) {
     const saltRounds = 10;
     const hashedPassword = new Promise((resolve, reject) => {
         bcrypt.hash(password, saltRounds, function (err, hash) {
-            if (err) reject(err)
+            if (err) {
+                reject(err)
+            }
             resolve(hash)
         });
     })
@@ -43,11 +45,11 @@ userSchema.methods.hashPassword = function (password) {
 };
 
 // Generate JavaWebToken for security
-userSchema.methods.generateJwt = () => {
-    return jwt.sign({ _id: this._id }
-        , process.env.JWT_SECRET, {
-        expiresIn: process.env.JWT_EXP
-    });
+userSchema.methods.generateJwt = (id) => {
+    return jwt.sign({ _id: id },
+        process.env.JWT_SECRET,
+        { expiresIn: process.env.JWT_EXP }
+    );
 };
 
 module.exports = mongoose.model('User', userSchema);
